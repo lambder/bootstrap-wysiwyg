@@ -20,6 +20,7 @@
 	};
 	$.fn.wysiwyg = function (userOptions) {
 		var editor = this,
+		    current_editor,
 			selectedRange,
 			options,
 			toolbarBtnSelector,
@@ -81,7 +82,7 @@
 				}
 			},
 			insertFiles = function (files) {
-				editor.focus();
+				current_editor.focus();
 				$.each(files, function (idx, fileInfo) {
 					if (/^image\//.test(fileInfo.type)) {
 						$.when(readFileIntoDataUrl(fileInfo)).done(function (dataUrl) {
@@ -105,7 +106,7 @@
 			bindToolbar = function (toolbar, options) {
 				toolbar.find(toolbarBtnSelector).click(function () {
 					restoreSelection();
-					editor.focus();
+					current_editor.focus();
 					execCommand($(this).data(options.commandRole));
 					saveSelection();
 				});
@@ -116,7 +117,7 @@
 					this.value = '';
 					restoreSelection();
 					if (newValue) {
-						editor.focus();
+						current_editor.focus();
 						execCommand($(this).data(options.commandRole), newValue);
 					}
 					saveSelection();
@@ -152,6 +153,10 @@
 						}
 					});
 			};
+
+		editor.focus(function(){
+			current_editor = this;
+		});	
 		options = $.extend({}, $.fn.wysiwyg.defaults, userOptions);
 		toolbarBtnSelector = 'a[data-' + options.commandRole + '],button[data-' + options.commandRole + '],input[type=button][data-' + options.commandRole + ']';
 		bindHotkeys(options.hotKeys);
